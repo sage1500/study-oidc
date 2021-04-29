@@ -1,0 +1,90 @@
+## issuer取得
+curl -s http://localhost:18080/auth/realms/demo | jq .
+curl -s http://localhost:18080/auth/realms/demo/.well-known/openid-configuration | jq .
+
+{
+  "realm": "demo",
+  "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxfLZ1K26f3gR8OJOZnGz5/Pt9gJ2l/hYfklUEWwRkaWCz213MK+O/QgowA41LxlwebgOyuKpYED47X+ekdsy8JxAfCuTFW2sczZUAdAMGckn1dWUzgZLT2Oz/3TgzVkItswPrT2KOg2WIyn1zATD0G54ucDmSN3eitsy7BviKz9fExTVbAb0SZtruHg5miqdYOLdwTC2UBfTv9ybxYZsdOEjV/SeOPxmzKFyY9flt5m9pDXTETpkARCPpwrCSjIoKe8JNQr7UJy/EcCLLu9OSXxFE2yYiY7lCFS0pHuZ43iIqucD24Z83CsUwvCQ+eDqnrnetMK0+wPqmmQCg9iJfQIDAQAB",
+  "token-service": "http://localhost:18080/auth/realms/demo/protocol/openid-connect",
+  "account-service": "http://localhost:18080/auth/realms/demo/account",
+  "tokens-not-before": 1610364064
+}
+
+    "issuer":"http://localhost:18080/auth/realms/demo",
+    "authorization_endpoint":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/auth",
+    "token_endpoint":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/token",
+    "introspection_endpoint":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/token/introspect",
+    "userinfo_endpoint":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/userinfo",
+    "end_session_endpoint":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/logout",
+    "jwks_uri":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/certs",
+    "check_session_iframe":"http://localhost:18080/auth/realms/demo/protocol/openid-connect/login-status-iframe.html",
+    "registration_endpoint":"http://localhost:18080/auth/realms/demo/clients-registrations/openid-connect",
+
+## クライアント情報
+- client-id: demoapp
+- client-secret: 08c33835-c18c-4dd7-a7df-aee3479d17c4
+
+## 認証要求
+
+■cmd.exe用
+curl -v -c cookie.txt http://localhost:18080/auth/realms/demo/protocol/openid-connect/auth ^
+    -d response_type=code ^
+    -d scope=openid ^
+    -d client_id=demoapp ^
+    --data-urlencode redirect_uri=http://localhost:8080/
+
+■bash用(URLのみ取得)
+curl -s -c cookie.txt http://localhost:18080/auth/realms/demo/protocol/openid-connect/auth \
+    -d response_type=code \
+    -d scope=openid \
+    -d client_id=demoapp \
+    --data-urlencode redirect_uri=http://localhost:8080/ \
+    | sed -n '/ action="/{s/^.*action="//;s/&amp;/\&/g;s/".*//;p}'
+
+
+## ログインボタン押下
+
+■cmd.exe用
+curl -v -b cookie.txt "http://localhost:18080/auth/realms/demo/login-actions/authenticate?session_code=IBiqWo9dAlecXr6A7nM77JJFJRaTbNIzrB26PpLNMNM&execution=bf50f7e8-4d91-4c51-92d3-41e5ddf74b09&client_id=demoapp&tab_id=D4d-6h916vI" ^
+    -d username=user1 ^
+    -d password=user1 ^
+    -d credentialId= ^
+    -d login=login
+
+■bash用(認可コード部分のみ取得)
+curl -v -s -b cookie.txt "http://localhost:18080/auth/realms/demo/login-actions/authenticate?session_code=NkOqqxxBpcq5qzwWFE7JKN3bn5fJXuLQVGtOVDVZfB4&execution=bf50f7e8-4d91-4c51-92d3-41e5ddf74b09&client_id=demoapp&tab_id=UVekIke4RKs" \
+    -d username=user1 \
+    -d password=user1 \
+    -d credentialId= \
+    -d login=login \
+    |& sed -n '/Location:/{s/.*?/\&/;s/.*&code=//;s/&.*//;p}'
+
+
+## トークン要求
+■cmd.exe用
+curl -v http://localhost:18080/auth/realms/demo/protocol/openid-connect/token ^
+    -u demoapp:08c33835-c18c-4dd7-a7df-aee3479d17c4 ^
+    -d grant_type=authorization_code ^
+    --data-urlencode redirect_uri=http://localhost:8080/ ^
+    -d code=9ea0d973-0ffd-49d4-8ada-8fa2dde296bd.4ac4cdd8-e40d-4351-98f9-1b752dcb41a2.3c29937d-e05d-4981-94ad-71e7f050f1c1
+
+■bash用
+curl -s http://localhost:18080/auth/realms/demo/protocol/openid-connect/token \
+    -u demoapp:08c33835-c18c-4dd7-a7df-aee3479d17c4 \
+    -d grant_type=authorization_code \
+    --data-urlencode redirect_uri=http://localhost:8080/ \
+    -d code=a5410ea1-c8e1-4fed-9c8c-44cd6a4705c4.4b91430c-f54a-4c69-92bd-9763af7b3598.3c29937d-e05d-4981-94ad-71e7f050f1c1 \
+    | jq .
+
+## UserInfo要求
+
+■bash用
+access_token=eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwVFdVYkxmcGxYVXZRTGctTVRPYjBtZ0JzRll6QnNnMm4yR09ONTJMek9BIn0.eyJleHAiOjE2MTk2OTc2NjEsImlhdCI6MTYxOTY5NzM2MSwiYXV0aF90aW1lIjoxNjE5Njk3MzYxLCJqdGkiOiJlMWE1NTU5OS03MWQwLTQwNmQtYWNhOS0zNWIzN2JlNjY4YzUiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjE4MDgwL2F1dGgvcmVhbG1zL2RlbW8iLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiM2E4NjViNGUtMTE2OS00NDlkLWJkZWUtNmEwOGE2YzMxY2ExIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZGVtb2FwcCIsInNlc3Npb25fc3RhdGUiOiI1YTQwYTVhYS1hOWM0LTRkZjUtODAzNS00ODI3N2M4MzdiMzgiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ1c2VyMSJ9.mJ6qZ-GtBYnUOy9SGhJvbsTb8bwzCqE3ofpJPcVqc2Gha148UzRYsFiI2ZwgsWoWrCJEeuxMru2K9cET0YvhCuQa9Laqq1GeQJhTPUEvRLkEbBtFvF9S9qoKeZN-EpAeLFGjBDTOpocZ5un18bujpP9bxrNL9qcsSnvWWt9o8ljNzYZ_WU0NoaI8IjrY44vz505f8RyybREDd9tbWDHBiUk03cOFxkNuRUdWCHWj5E01edCkra4yrRRQSzinWnS0LMJZdrBdBxdMgG5DqzEVgaTbnbx0JemPxedUaYtKheLY5KEvjcYAfGIT_GbJQr6hFihdRxQRSf6UmNsWNNEATA
+curl -s -v http://localhost:18080/auth/realms/demo/protocol/openid-connect/userinfo \
+    -H "Authorization: Bearer $access_token"
+
+```
+  GET /userinfo HTTP/1.1
+  Host: server.example.com
+  Authorization: Bearer SlAV32hkKG
+```
