@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/hello")
+@RequestMapping("hello")
 @Slf4j
 public class HelloController {
-    @GetMapping("/")
+    @GetMapping
     public String hello(@AuthenticationPrincipal Jwt jwt) {
         log.debug("[HELLO]hello jwt={}", jwt);
         return "Hello " + jwt.getClaimAsString("preferred_username");
