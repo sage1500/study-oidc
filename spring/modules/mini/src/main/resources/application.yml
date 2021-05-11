@@ -1,0 +1,10 @@
+spring.security.oauth2.client:
+  registration:
+    demoapp:
+      provider: keycloak
+      client-id: demoapp
+      client-secret: 08c33835-c18c-4dd7-a7df-aee3479d17c4
+      scope: openid
+  provider:
+    keycloak:
+      issuer-uri: http://localhost:18080/auth/realms/demo
