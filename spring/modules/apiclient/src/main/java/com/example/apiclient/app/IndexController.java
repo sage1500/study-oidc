@@ -24,7 +24,7 @@ public class IndexController {
 
     @PostMapping("hello")
     public Mono<String> hello() {
-        return webClientForHello.get().uri("hello").retrieve().bodyToMono(String.class).map(result -> {
+        return webClientForHello.get().uri("/hello").retrieve().bodyToMono(String.class).map(result -> {
             log.info("★hello: {}", result);
             return "index";
         });

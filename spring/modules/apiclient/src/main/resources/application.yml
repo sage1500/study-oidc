@@ -22,5 +22,5 @@ spring.security.oauth2.client.provider:
 
 services:
   hello:
-    base-url: http://localhost:8081/api/v1/
+    base-url: http://localhost:8081/api/v1
     client-registration-id: demoapp
