@@ -7,7 +7,12 @@ spring.main.banner-mode: off
 logging.level:
   com.example: DEBUG
 
+my.urls:
+  back-auth: http://localhost:18080/auth
+
 ## Spring Security (リソースサーバー)
 spring.security.oauth2.resourceserver:
   jwt:
-    issuer-uri: http://localhost:18080/auth/realms/demo
+    jwk-set-uri: ${my.urls.back-auth}/realms/demo/protocol/openid-connect/certs
+    # jws-algorithm: RS256
+    # issuer-uri: ${my.urls.back-auth}/realms/demo
