@@ -1,2 +1,2 @@
 rootProject.name = 'sample'
-include ":modules:apiclient", ":modules:apiserver", ":modules:mini"
+include ":modules:apiclient", ":modules:apiserver", ":modules:mini", ":modules:full", ":modules:webapp"
