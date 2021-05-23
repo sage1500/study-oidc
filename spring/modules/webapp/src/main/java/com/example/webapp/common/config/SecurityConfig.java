@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -50,7 +51,8 @@ public class SecurityConfig {
         // OAuth2 ログイン
         // @formatter:off
         http.oauth2Login()
-                .authorizationRequestResolver(((Supplier<ServerOAuth2AuthorizationRequestResolver>)() -> {
+            .authenticationFailureHandler(new RedirectServerAuthenticationFailureHandler("/?error"))
+            .authorizationRequestResolver(((Supplier<ServerOAuth2AuthorizationRequestResolver>)() -> {
                         var resolver = new DefaultServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
                         resolver.setAuthorizationRequestCustomizer(customizer -> customizer.additionalParameters(params -> {
                             var locale = LocaleContextHolder.getLocale();
@@ -74,6 +76,13 @@ public class SecurityConfig {
             // .logoutHandler: SecurityContextServerLogoutHandler
             // .logoutSuccessHandler: RedirectServerLogoutSuccessHandler
         });
+
+        // // @formatter:off
+        // http.exceptionHandling()
+        //     .accessDeniedHandler(null)
+        //     .authenticationEntryPoint(null)
+        //     ;
+        // // @formatter:on
 
         return http.build();
     }

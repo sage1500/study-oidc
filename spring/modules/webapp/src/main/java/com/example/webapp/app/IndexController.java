@@ -13,4 +13,9 @@ public class IndexController {
         return "index";
     }
 
+    @GetMapping(params = "error")
+    public String error() {
+        return "error";
+    }
+
 }
