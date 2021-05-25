@@ -7,11 +7,24 @@
 </head>
 
 <body>
-    <h1>トップ</h1>
+    現在の状態：
+    <ul>
+        <li th:each="message : ${messages}" th:text="${message}"></li>
+    </ul>
+    <hr>
 
     <form th:action="@{/hello}" method="post">
         <button>Hello</button>
     </form>
+    <form th:action="@{/hello3}" method="get">
+        <button>API連携</button>
+    </form>
+
+    <hr>
+    結果：
+    <ul>
+        <li th:each="message : ${resultMessages}" th:text="${message}"></li>
+    </ul>
 </body>
 
 </html>
